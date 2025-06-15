@@ -99,16 +99,7 @@ class Index extends Component<IProps, PageState> {
   }
 
   render() {
-    return (
-      <View className="index">
-        <NavBar
-          title={this.renderNavBarTitle()}
-          backgroundColor="#F3E4AD"
-          rightContent={this.renderNavBarRight()}
-          onBack={() => Taro.switchTab({ url: "/pages/home/index" })}
-        />
-      </View>
-    );
+    return <View className="index"></View>;
   }
 }
 

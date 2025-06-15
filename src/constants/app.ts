@@ -1,1 +1,3 @@
 export const SET_CURRENT = "SET_CURRENT";
+export const SET_NAV_TITLE = "SET_NAV_TITLE";
+export const SET_RIGHT_CONTENT = "SET_RIGHT_CONTENT";
