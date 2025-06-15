@@ -4,9 +4,11 @@ import { View, Button, Text } from "@tarojs/components";
 
 import { add, minus, asyncAdd } from "../../actions/counter";
 import type { RootState } from "../../store";
-import { AtTabBar } from "taro-ui";
+import { AtTabBar, AtAvatar } from "taro-ui";
+import NavBar from "src/component/NavBar";
 
 import "./index.scss";
+import Taro from "@tarojs/taro";
 
 // #region 书写注意
 //
@@ -32,7 +34,9 @@ type PageDispatchProps = {
 
 type PageOwnProps = {};
 
-type PageState = {};
+type PageState = {
+  current: number;
+};
 
 type IProps = PageStateProps & PageDispatchProps & PageOwnProps;
 
@@ -55,7 +59,8 @@ interface Index {
     },
   })
 )
-class Index extends Component<IProps> {
+class Index extends Component<IProps, PageState> {
+  state: PageState;
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -79,14 +84,34 @@ class Index extends Component<IProps> {
 
   componentDidHide() {}
 
+  renderNavBarTitle() {
+    return <Text style={{ color: "000", fontSize: "22px" }}>收藏</Text>;
+  }
+
+  renderNavBarRight() {
+    return (
+      <AtAvatar
+        circle
+        size="small"
+        image="https://jdc.jd.com/img/200"
+      ></AtAvatar>
+    );
+  }
+
   render() {
     return (
       <View className="index">
+        <NavBar
+          title={this.renderNavBarTitle()}
+          backgroundColor="#F3E4AD"
+          rightContent={this.renderNavBarRight()}
+          onBack={() => Taro.switchTab({ url: "/pages/home/index" })}
+        />
         <AtTabBar
           fixed
-          backgroundColor="#CBD5E0"
-          color="#1A202C"
-          selectedColor="#D4AF37"
+          backgroundColor="#F3E4AD"
+          color="#797979"
+          selectedColor="#E37469"
           tabList={[
             { title: "模特", iconType: "user" },
             { title: "换装", iconType: "shopping-bag" },
