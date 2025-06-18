@@ -4,6 +4,7 @@ import Taro from "@tarojs/taro";
 
 const GlobalNavBar = ({ title, rightContent }) => (
   <NavBar
+    fixed
     title={title}
     rightContent={rightContent}
     backgroundColor="#F3E4AD"
