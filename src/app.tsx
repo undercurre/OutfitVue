@@ -18,12 +18,7 @@ class App extends Component<PropsWithChildren> {
   // 在 App 类中的 render() 函数没有实际作用
   // 请勿修改此函数
   render() {
-    return (
-      <Provider store={store}>
-        <GlobalNavBar title="标题" rightContent={null} />
-        {this.props.children}
-      </Provider>
-    );
+    return <Provider store={store}>{this.props.children}</Provider>;
   }
 }
 
