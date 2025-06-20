@@ -1,10 +1,6 @@
 import { Component } from "react";
-import { connect } from "react-redux";
-import { View, Text } from "@tarojs/components";
-
-import { add, minus, asyncAdd } from "../../actions/counter";
-import type { RootState } from "../../store";
-import { AtAvatar } from "taro-ui";
+import { View } from "@tarojs/components";
+import BasePage from "../../component/BasePage";
 
 import "./index.scss";
 
@@ -31,22 +27,7 @@ type IProps = PageStateProps & PageDispatchProps & PageOwnProps;
 interface Index {
   props: IProps;
 }
-@connect<PageStateProps, PageDispatchProps, PageOwnProps>(
-  (state: RootState) => ({
-    counter: state.counter,
-  }),
-  (dispatch: any) => ({
-    add() {
-      dispatch(add());
-    },
-    dec() {
-      dispatch(minus());
-    },
-    asyncAdd() {
-      dispatch(asyncAdd());
-    },
-  })
-)
+
 class Index extends Component<IProps, PageState> {
   state: PageState;
   constructor(props: IProps) {
@@ -72,22 +53,13 @@ class Index extends Component<IProps, PageState> {
 
   componentDidHide() {}
 
-  renderNavBarTitle() {
-    return <Text style={{ color: "000", fontSize: "22px" }}>换装</Text>;
-  }
-
-  renderNavBarRight() {
-    return (
-      <AtAvatar
-        circle
-        size="small"
-        image="https://jdc.jd.com/img/200"
-      ></AtAvatar>
-    );
-  }
-
   render() {
-    return <View className="index"></View>;
+    return (
+      <BasePage title="首页" navProps={{ backgroundColor: "#f5f5f5" }}>
+        {/* 页面具体内容 */}
+        <View>换装</View>
+      </BasePage>
+    );
   }
 }
 
