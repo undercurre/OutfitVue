@@ -55,7 +55,7 @@ class Index extends Component<IProps, PageState> {
 
   render() {
     return (
-      <BasePage title="首页" navProps={{ backgroundColor: "#f5f5f5" }}>
+      <BasePage navProps={{ backgroundColor: "#f5f5f5", showBack: false }}>
         {/* 页面具体内容 */}
         <View>收藏</View>
       </BasePage>

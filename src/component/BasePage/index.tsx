@@ -2,7 +2,18 @@
 import { View } from "@tarojs/components";
 import NavBar from "../NavBar";
 
-export default function BasePage({ children, title, navProps }) {
+export default function BasePage({
+  children,
+  title,
+  navProps,
+}: {
+  children: React.ReactNode;
+  title?: string;
+  navProps?: {
+    backgroundColor?: string;
+    showBack?: boolean;
+  };
+}) {
   return (
     <View className="base-page">
       <NavBar title={title} {...navProps} />
