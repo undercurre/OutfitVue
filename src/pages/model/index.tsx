@@ -4,6 +4,9 @@ import BasePage from "../../component/BasePage";
 import { AtSegmentedControl } from "taro-ui";
 
 import "./index.scss";
+import ModelCard from "./components/card";
+import Gallery, { Model } from "./components/gallery";
+import url from "src/utils/cos";
 
 type PageStateProps = {
   counter: {
@@ -18,12 +21,6 @@ type PageDispatchProps = {
 };
 
 type PageOwnProps = {};
-
-type Model = {
-  id: number;
-  name: string;
-  image: string;
-};
 
 type PageState = {
   current: number;
@@ -47,12 +44,13 @@ class Index extends Component<IProps, PageState> {
         {
           id: 1,
           name: "张三",
-          image: "",
+          image: url,
         },
         {
           id: 2,
           name: "李四",
-          image: "https://example.com/man2.jpg",
+          image:
+            "http://gips0.baidu.com/it/u=3602773692,1512483864&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280",
         },
       ],
       woman: [],
@@ -83,8 +81,16 @@ class Index extends Component<IProps, PageState> {
           onClick={this.handleClick.bind(this)}
           current={this.state.current}
         />
-        {this.state.current === 0 ? <View>{}</View> : null}
-        {this.state.current === 1 ? <View></View> : null}
+        {this.state.current === 0 ? (
+          <View className="model-list">
+            <Gallery models={this.state.man}></Gallery>
+          </View>
+        ) : null}
+        {this.state.current === 1 ? (
+          <View className="model-list">
+            <Gallery models={this.state.woman}></Gallery>
+          </View>
+        ) : null}
       </BasePage>
     );
   }

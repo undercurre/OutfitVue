@@ -1,93 +1,71 @@
 // src/utils/cos.js
 import COS from "cos-wx-sdk-v5";
-import Taro from "@tarojs/taro";
 
-// 初始化配置（建议将敏感信息放在服务端）
-const cosConfig = {
-  bucket: "your-bucket-name-123456", // 替换为你的存储桶名称
-  region: "ap-shanghai", // 替换为你的存储桶地域
-  secretId: "YOUR_SECRET_ID", // 从服务端获取（前端存储有安全风险）
-  secretKey: "YOUR_SECRET_KEY", // 从服务端获取
+const res = {
+  code: 200,
+  msg: "Success",
+  data: {
+    expire: "1751721431",
+    credentials: {
+      sessionToken:
+        "UQK8IWC30qrbdGunwJGmPawIU5WcLo5abd2625100f07be0503da9a77d20281085hzBiYwPp_OMDS4B0TRtfSJpxEiW0CZ3mornYV9d44-j7So6gX08FHXal9dEtvZLG8jDE6Isv3ok-M3F93qkcpr2S-a_S9rOa1lg3BzMExfhoAGZSFYsaGNFm0am1k9vfRwQKbd8CJ3-vsp2aUKw_doZ6PTEprGkRvmxoNJ1g9vSTNlSdmY7xe245togODzxQNlFisbGCh-zuToh8Rhc9V1vPSvEEJwWeD0V_06AoUrdbt8bQaBZfRAqV9DOgXuC7Ex3U7hcaosnHrb9j2YAZeWyorSp_5F0cSh5dKr_PZhj1KORQbnSQidUbnrVSjSuzq9uzm1eh7YX3uBePCvZGZmIdoXTJuxagy8Lj4MFX6tRb4qEFZVwP-0IK1dnR9jk4czH4P7QW5nO1HpVqOC1lqjLOiBWek2Qx41xaS2CfONkrQU957vxCw4GyCbs0xwLpIotzSem8BEvM6Q-77xHIQy0uWkndr2QuJ7lnD0b98w",
+      tmpSecretId:
+        "AKIDs0B65111zJN1uhDMthjjD5su2qBHe1yo6tzXpO4NiFUNzD5HMmcQC72GAlQDUC16",
+      tmpSecretKey: "MiEqbD6kcGCZn4M4t/EoVp0ScQkNwbRK4ZfiGP9sCl0=",
+    },
+    host: "outfitvue-1305592523.cos.ap-guangzhou.myqcloud.com",
+    dir: "model/",
+  },
 };
+const {
+  expire,
+  credentials: { sessionToken, tmpSecretId, tmpSecretKey },
+  host,
+  dir,
+} = res.data;
 
-// 创建 COS 实例
-const cos = new COS(
-  SecretId: cosConfig.secretId,
-  SecretKey: cosConfig.secretKey,
-  SimpleUploadMethod: "putObject", // 微信小程序环境建议使用 putObject
+const cos = new COS({
+  getAuthorization: (options, callback) => {
+    callback({
+      TmpSecretId: tmpSecretId,
+      TmpSecretKey: tmpSecretKey,
+      SecurityToken: sessionToken,
+      ExpiredTime: Number(expire), // SDK 需毫秒时间戳
+    });
+  },
 });
 
-/**
- * COS 图片上传
- * @param {string} filePath - 本地文件路径（来自 Taro.chooseImage）
- * @param {string} [dir='images/'] - 存储目录
- * @returns {Promise<string>} 图片的在线URL
- */
-export const uploadImage = async (filePath, dir = "images/") => {
-  try {
-    // 生成随机文件名（防止覆盖）
-    const timestamp = new Date().getTime();
-    const random = Math.floor(Math.random() * 1000);
-    const key = `${dir}${timestamp}_${random}.jpg`;
+const key = `${dir}man_1.png`; // 完整文件路径: "model/image.jpg"
 
-    // 执行上传
-    const { statusCode, Location } = await cos.putObject({
-      Bucket: cosConfig.bucket,
-      Region: cosConfig.region,
-      Key: key,
-      FilePath: filePath,
-      onProgress: (progressData) => {
-        console.log("上传进度:", progressData.percent * 100 + "%");
-      },
-    });
+let url = "";
 
-    if (statusCode === 200) {
-      // 构建完整的访问 URL
-      return `https://${Location}`;
-    }
-    throw new Error(`上传失败，状态码: ${statusCode}`);
-  } catch (error) {
-    console.error("COS上传错误:", error);
-    throw new Error("图片上传失败，请重试");
+cos.getObjectUrl(
+  {
+    Bucket: "outfitvue-1305592523", // 从 host 提取: outfitvue-1305592523.cos.ap-guangzhou.myqcloud.com
+    Region: "ap-guangzhou", // 从 host 提取
+    Key: key, // 文件路径
+  },
+  (err, data) => {
+    if (err) throw err;
+    console.log("预览 URL:", data.Url); // 得到带签名的链接
+    url = data.Url; // 将 URL 存储在变量中
   }
-};
+);
 
-/**
- * COS 文件下载（返回临时路径供预览）
- * @param {string} url - 文件在线URL
- * @returns {Promise<string>} 本地临时文件路径
- */
-export const downloadFile = async (url) => {
-  try {
-    const { tempFilePath } = await Taro.downloadFile({
-      url,
-      header: { "Cache-Control": "no-cache" },
-    });
-    return tempFilePath;
-  } catch (error) {
-    console.error("文件下载失败:", error);
-    throw new Error("文件下载失败");
-  }
-};
+export default url;
 
-/**
- * 安全获取 COS 签名 URL（适用于私有桶）
- * @param {string} key - 文件在 COS 中的路径
- * @param {number} [expires=900] - 链接有效期（秒）
- * @returns {Promise<string>} 带签名的临时 URL
- */
-export const getSecureUrl = (key, expires = 900) => {
+export const getModelUrl = async (filename: string) => {
   return new Promise((resolve, reject) => {
     cos.getObjectUrl(
       {
-        Bucket: cosConfig.bucket,
-        Region: cosConfig.region,
-        Key: key,
-        Expires: expires,
+        Bucket: "outfitvue-1305592523",
+        Region: "ap-guangzhou",
+        Key: `${dir}${filename}`, // 动态生成文件路径
         Sign: true,
       },
       (err, data) => {
-        err ? reject(err) : resolve(data.Url);
+        if (err) return reject(err);
+        resolve(data.Url);
       }
     );
   });
